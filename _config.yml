@@ -4,16 +4,16 @@
 
 # Site
 title: Tech Notes
-subtitle:
-description:
+subtitle: Idea First
+description: My tech notes (in Chinese)
 author: Elmer Yu
-language:
-timezone:
+language: zh_CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://ak64th.github.com/notes/
-root: /
+url: http://ak64th.github.com/notes
+root: /notes/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -80,4 +80,6 @@ disqus_shortname: ak64th-notes
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:ak64th/notes
+  branch: gh-pages
