@@ -1545,7 +1545,7 @@ hexo-renderer-ejs@^0.3.0:
 
 hexo-renderer-marked@^0.3.0:
   version "0.3.2"
-  resolved "https://registry.npm.taobao.org/hexo-renderer-marked/download/hexo-renderer-marked-0.3.2.tgz#d6a37af9ff195e30f9ef6ede1a06ea1fe4322966"
+  resolved "https://registry.npm.taobao.org/hexo-renderer-marked/download/hexo-renderer-marked-0.3.2.tgz?cache=0&sync_timestamp=1564723702644&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fhexo-renderer-marked%2Fdownload%2Fhexo-renderer-marked-0.3.2.tgz#d6a37af9ff195e30f9ef6ede1a06ea1fe4322966"
   integrity sha1-1qN6+f8ZXjD5727eGgbqH+QyKWY=
   dependencies:
     hexo-util "^0.6.2"
