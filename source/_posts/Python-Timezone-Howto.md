@@ -85,18 +85,6 @@ time.mktime(now.astimezone(current_tz).timetuple())
 
 实测使用`timedelta.total_seconds()`的方法速度更快，使用上也更方便。
 
-*为什么本地时区的偏差值不是整数小时？*
-
-时区是随着历史发展不断改变的，`pytz`会使用附带的时区数据库中找到的第一条记录作为当前时区，比如中国地区最早使用的是LMT+8:06:00时区。
-使用`now`或`astimezone`等方法时pytz会把时区调整到当前使用的标准时区。如果需要处理带有这些遗留时区信息的datetime对象，可以用`normalize`方法：
-
-``` python
-lmt_now = now.replace(tzinfo=current_tz)
-# datetime.datetime(2018, 3, 15, 6, 44, 13, 343971, tzinfo=<DstTzInfo 'Asia/Shanghai' LMT+8:06:00 STD>)
-lmt_now = current_tz.normalize(lmt_now)
-# datetime.datetime(2018, 3, 15, 6, 38, 13, 343971, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>)
-```
-
 
 # Django处理时区的方式
 
@@ -136,6 +124,112 @@ django在输出模板时会使用`django.utils.timezone.localtime`函数把日�
 在有夏令时制度(Daylight Saving Time)的地区，一年内某一个小时会重复两次，用`datetime.datetime`的数据格式无法表示其中的区别。这也是使用UTC时区的另一个原因。
 
 在使用`astimezone`转换时区时如果发生了跨域DST时区的状况，结果可能会不准确。使用`pytz.timezone.normalize`方法可以修正这一问题。
+
+*为什么本地时区的偏差值不是整数小时？*
+
+某一地区的时区并不是固定的。比如在北美州的大部分地区，在夏时制以外的时间处于比UTC晚六个小时的`CST -6`时区，在夏时制期间则处于比UTC晚五个小时的`CDT -5`时区。时区可以看作一个签名为`fn (region, date)`的函数，所以当我们运行`pytz.timezone('Asia/Shanghai')`时，pytz无法得知应该返回哪个时间的时区信息，默认返回数据库内最早的记录，也就是`Local Mean Timezone`的信息。
+
+具体可以看`pytz.tzfile.build_tzinfo()`函数。
+
+来看看时区信息具体有哪些：
+
+```python
+import pytz
+
+sh = pytz.timezone('Asia/Shanghai')
+
+sh._utc_transition_times
+'''
+[datetime.datetime(1, 1, 1, 0, 0),
+ datetime.datetime(1901, 12, 13, 20, 45, 52),
+ datetime.datetime(1940, 5, 31, 16, 0),
+ datetime.datetime(1940, 10, 12, 15, 0),
+ datetime.datetime(1941, 3, 14, 16, 0),
+ datetime.datetime(1941, 11, 1, 15, 0),
+ datetime.datetime(1942, 1, 30, 16, 0),
+ datetime.datetime(1945, 9, 1, 15, 0),
+ datetime.datetime(1946, 5, 14, 16, 0),
+ datetime.datetime(1946, 9, 30, 15, 0),
+ datetime.datetime(1947, 4, 14, 16, 0),
+ datetime.datetime(1947, 10, 31, 15, 0),
+ datetime.datetime(1948, 4, 30, 16, 0),
+ datetime.datetime(1948, 9, 30, 15, 0),
+ datetime.datetime(1949, 4, 30, 16, 0),
+ datetime.datetime(1949, 5, 27, 15, 0),
+ datetime.datetime(1986, 5, 3, 18, 0),
+ datetime.datetime(1986, 9, 13, 17, 0),
+ datetime.datetime(1987, 4, 11, 18, 0),
+ datetime.datetime(1987, 9, 12, 17, 0),
+ datetime.datetime(1988, 4, 16, 18, 0),
+ datetime.datetime(1988, 9, 10, 17, 0),
+ datetime.datetime(1989, 4, 15, 18, 0),
+ datetime.datetime(1989, 9, 16, 17, 0),
+ datetime.datetime(1990, 4, 14, 18, 0),
+ datetime.datetime(1990, 9, 15, 17, 0),
+ datetime.datetime(1991, 4, 13, 18, 0),
+ datetime.datetime(1991, 9, 14, 17, 0)]
+'''
+sh._transition_info
+'''
+[(datetime.timedelta(0, 29160), datetime.timedelta(0), 'LMT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST'),
+ (datetime.timedelta(0, 32400), datetime.timedelta(0, 3600), 'CDT'),
+ (datetime.timedelta(0, 28800), datetime.timedelta(0), 'CST')]
+'''
+```
+
+使用`now`或`astimezone`等方法时pytz会把时区调整到当前使用的标准时区。如果需要处理带有这些遗留时区信息的datetime对象，可以用`normalize`方法：
+
+``` python
+lmt_now = now.replace(tzinfo=current_tz)
+# datetime.datetime(2018, 3, 15, 6, 44, 13, 343971, tzinfo=<DstTzInfo 'Asia/Shanghai' LMT+8:06:00 STD>)
+lmt_now = current_tz.normalize(lmt_now)
+# datetime.datetime(2018, 3, 15, 6, 38, 13, 343971, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>)
+```
+
+另外宽泛的说，`datetime.datetime.replace()`方法非常容易引入bug，应该尽量避免使用这个方法。如果需要构造一个带有时区信息的datetime实例，使用`datetime.astimezone()`或者`pytz.timezone.localize()`：
+
+```python
+import pytz
+
+sh = pytz.timezone('Asia/Shanghai')
+
+# Don't do this
+datetime.datetime(2019, 12, 31, tzinfo=sh)
+# Nor this
+datetime.datetime(2019, 12, 31).replace(tzinfo=sh)
+# datetime.datetime(2019, 12, 31, 0, 0, tzinfo=<DstTzInfo 'Asia/Shanghai' LMT+8:06:00 STD>)
+
+# Do this
+sh.localize(datetime.datetime(2010, 12, 31))
+# Or
+datetime.datetime(2019, 12, 31).astimezone(sh)
+# datetime.datetime(2019, 12, 31, 0, 0, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>)
+```
 
 # Reference
 
