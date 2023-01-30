@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>关于编码的一些知识 | Tech Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="稍微整理了一下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于编码的一些知识">
+<meta property="og:url" content="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/index.html">
+<meta property="og:site_name" content="Tech Notes">
+<meta property="og:description" content="稍微整理了一下">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/EBCDIC.png">
+<meta property="og:image" content="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/EBCDIC_008.png">
+<meta property="og:updated_time" content="2023-01-30T06:57:55.591Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于编码的一些知识">
+<meta name="twitter:description" content="稍微整理了一下">
+<meta name="twitter:image" content="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/EBCDIC.png">
+  
+    <link rel="alternate" href="/notes/atom.xml" title="Tech Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/notes/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/notes/" id="logo">Tech Notes</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/notes/" id="subtitle">Idea First</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/notes/">Home</a>
+        
+          <a class="main-nav-link" href="/notes/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/notes/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ak64th.github.com/notes"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-AboutEncoding" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/notes/2020/01/30/AboutEncoding/" class="article-date">
+  <time datetime="2020-01-30T06:46:00.000Z" itemprop="datePublished">2020-01-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      关于编码的一些知识
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>稍微整理了一下<br><a id="more"></a></p>
+<h2 id="字符集与编码的关系"><a href="#字符集与编码的关系" class="headerlink" title="字符集与编码的关系"></a>字符集与编码的关系</h2><p>代码点（Code Point）： 无符号整数</p>
+<p>字符集（Char Set）：代码点到字符的映射</p>
+<p>编码系统（Encoding）：将代码点”编码”成二进制数据和将二进制数据”解码“成代码点的机制</p>
+<p>代码点的概念只有对于 Unicode 系统有意义，对于简单的字符集和编码系统而言，可以把编码系统看作字符到二进制数据的映射。</p>
+<p>重要的是，字符和代码点都是存在于概念之中的，并不是具体的数据，编码系统的用处就是在概念之中的字符和二进制数据之间相互转换。</p>
+<h3 id="同一个字符集可以有多种编码"><a href="#同一个字符集可以有多种编码" class="headerlink" title="同一个字符集可以有多种编码"></a>同一个字符集可以有多种编码</h3><p>要定义一种字符编码，需要先定义它支持的字符集，比如 ASCII 编码支持的字符集就是 ASCII 表内的所有字符。因此，如果我们知道一段文本使用的字符编码，我们可以确定这段文本中所有的字符都属于某一个字符集。但对于相反的情况，即使确定了了一段文本的字符集也不能确定使用的编码。</p>
+<p>假设有一种语言 L-1，只有 A、B、C 三个字符，不存在小写字符，我们可以为它定义一个字符集 CS-1。如果我们需要通过网络把一段 L-1 语言， CS-1 字符集的文本传输到远方，就需要将这段文本编码（encode）成二进制数据。</p>
+<p>鉴于 A，B，C 都是存在于 ASCII 表内的字符，一种思路是直接使用 ASCII 编码。</p>
+<table>
+<thead>
+<tr>
+<th>bits</th>
+<th>character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01000001</td>
+<td>A</td>
+</tr>
+<tr>
+<td>01000010</td>
+<td>B</td>
+</tr>
+<tr>
+<td>01000011</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>对于 CS-1 字符集文本<code>ABCBB</code>，它的 ASCII 编码为<code>0100000101000010010000110100000101000001</code>。很明显，采用 ASCII 编码时，数据的带宽利用率并没有达到最高，即使把编码内所有<code>010000</code>都去掉依然可以表达 CS-1 字符集内的所有字符，并不需要像 ASCII 编码那样使用8比特表示一个字符。</p>
+<p>定义一种新编码，E-1：</p>
+<table>
+<thead>
+<tr>
+<th>bits</th>
+<th>character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>A</td>
+</tr>
+<tr>
+<td>10</td>
+<td>B</td>
+</tr>
+<tr>
+<td>11</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>对于 CS-1 字符集文本<code>ABCBB</code>，它的 E-1 编码为<code>0110110101</code>。</p>
+<h3 id="字符编码可以支持多个已经存在的字符集"><a href="#字符编码可以支持多个已经存在的字符集" class="headerlink" title="字符编码可以支持多个已经存在的字符集"></a>字符编码可以支持多个已经存在的字符集</h3><p>对于先存在字符集，后定义字符编码的情况，字符编码的字符集是它需要支持的所有字符集的超集。</p>
+<p>早期的 Windows-936 编码制定目标是支持 <code>GB2312</code> 字符集，在之后的版本中多次扩展了支持的字符种类，可以完整支持 <code>GBK</code> 字符集和一些其他符号（比如欧元符号 € ）。</p>
+<h2 id="编码表和代码页（Code-Page）"><a href="#编码表和代码页（Code-Page）" class="headerlink" title="编码表和代码页（Code Page）"></a>编码表和代码页（Code Page）</h2><p>因为一个字节的二进制数据可以用两个十六进制数字表示，所以对于单字节长度的编码系统，存在一种用 16 × 16 表格表示编码的方法。比如 EBCDIC 编码表：</p>
+<p><img src="EBCDIC.png" alt="EBCDIC"></p>
+<p>如果想要对字符<code>a</code>进行 EBCDIC 编码，查阅上表得到对应位置 _8 行 _1 列，也就是十六进制数字 81，二进制表示<code>10000001</code>。</p>
+<p>考虑到世界上文字的总数，如何表示超过单个字节表示能力的字符很快成为了必须解决的问题。</p>
+<p>一种思路是，使用不变的字节数表示单个字符，并按照系统的实际需求使用不同的方式代码表，比如对于需要显示法文字母的系统使用 EBCDIC 008。</p>
+<p><img src="EBCDIC_008.png" alt="EBCDIC 008"></p>
+<p>这些不同的代码表被称为代码页（Code page）。</p>
+<h2 id="固定长度多字节编码系统"><a href="#固定长度多字节编码系统" class="headerlink" title="固定长度多字节编码系统"></a>固定长度多字节编码系统</h2><p>另一种思路是为每个字符分配更多的字节。定义一种新编码，E-2。E-2 将 L-2 的每个字符拆分成两部分，用两个字节分别表示。</p>
+<p>假定存在语言 L-2，包含 A<sub>001</sub> 到 C<sub>999</sub>，总共 3 × 999 = 2997 个字符。 定义字符集 CS-2，包含 L-1和 L-2 的全部字符。如何才能用二进制数据表示 L-2 语言的文本呢？</p>
+<table>
+<thead>
+<tr>
+<th>bits</th>
+<th>character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00000001 00000000</td>
+<td>A</td>
+</tr>
+<tr>
+<td>00000010 00000000</td>
+<td>B</td>
+</tr>
+<tr>
+<td>00000011 00000000</td>
+<td>C</td>
+</tr>
+<tr>
+<td>00000001 00000001</td>
+<td>A<sub>001</sub></td>
+</tr>
+<tr>
+<td>00000001 00000010</td>
+<td>A<sub>002</sub></td>
+</tr>
+<tr>
+<td>00000001 00000011</td>
+<td>A<sub>003</sub></td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>使用超过一个字节表示的字符称为宽字符（Wide character）。</p>
+<p>使用长度固定为两个字节表示每个字符的编码被称为 DBCS ( double-byte character set ) ，也存在 TBCS 等。</p>
+<p>这种固定字节长度的编码系统存在着两个缺点：</p>
+<ol>
+<li>限制了字符集的字符数量，比如用 DBCS 至多可以表示2<sup>16</sup>种字符。编码系统的设计者不得不在多种语言的支持中做出取舍，在发展的过程中诞生了无数无标准/半标准化的编码。比如某个开发者需要系统同时处理希腊字母和俄语字母，而当时的编码规范中没有可以同时支持这两种字符集的，则这个开发者便不得不发明一种新编码。这也是有这么多不同的编码规范存在的原因之一。</li>
+<li>在空间利用率上存在缺陷，比如用 DBCS 保存文本，即使文本中只包含 ASCII 编码中的字符，依然要付出两倍的空间。</li>
+</ol>
+<p>为此人们发明出了可变长度编码系统，并制定了 Unicode 标准，</p>
+<h2 id="可变长度编码系统"><a href="#可变长度编码系统" class="headerlink" title="可变长度编码系统"></a>可变长度编码系统</h2><p>可变长度编码系统中，每个字符的二进制编码可能是一到多个字节，系统通过一些规则将二进制数据流切割成字符。比如将每个字节第一位作为是否有后续数据的标识位（这只是方法之一）。</p>
+<p>这种编码系统引入了代码单元（Code Unit）的概念。某个编码系统的代码单元是该编码系统表示单个字符时所能使用的最少比特位数，同时也是编码系统解码二进制数据时处理的最小单元。比如对于代码单元为8比特的编码系统，每个字符可能用 8，16，24……个比特表示，对于代码单元为16比特的编码系统，每个字符可能用16，32，48……个比特表示。</p>
+<h2 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h2><p>为了保证编码传输的一致性，人们从上世纪八十年代末期就开始寻求一种可以表示大部分文字的编码方案，unicode 正是这种努力的产物，直到今天 unicode 标准也在不停更新之中。</p>
+<p>Unicode 定义了从 0 到 10FFFF 总计一百多万个代码点，其中 0 到 FFFF 被定义为 BMP（ <a href="https://en.wikipedia.org/wiki/Basic_Multilingual_Plane" target="_blank" rel="noopener">Basic Multilingual Plane</a> ）。Unicode 的代码点有大量空余，这保证了它有充足的扩展空间。Unicode 12.1 定义了137,994个字符和代码点的映射关系。Unicode的代码点可以用<code>\u</code> + 数字表示。比如<code>\u2466</code>（对应字符⑦）。</p>
+<p>Unicode 是一个字符集，但并不是编码系统，有多种编码系统支持 unicode 。</p>
+<ul>
+<li>UCS-2：使用固定长度2字节表示每个字符，严格把代码点一对一映射到整数，只能表示 BMP 内的字符（<code>\u0000</code> - <code>\uFFFF</code>）。Windows XP使用UCS-2编码。现代软件很多都不再支持 UCS-2，如果我们需要读取 UCS-2 编码的文件，可以直接当作 UTF-16 解码。</li>
+<li>UCS-4：使用固定长度4字节表示每个字符，严格把代码点一对一映射到整数，范围 <code>00000000</code> - <code>7FFFFFFF</code>。可以表示所有的 unicode 代码点。</li>
+<li>UTF-8：使用一字节长度代码单元的可变长度编码系统，互联网上超过90%的网页使用 UTF-8 编码，事实上的网页标准。对于 UTF-8，若一个代码单元第一个比特为0，说明这是一个 ASCII 字符，若为1，则1连续出现的数量表示这个字符占用的字节数。若一个代码单元是110xxxxx，则这个字符占用2字节，若为1110xxxx，则这个字符占用3个字节。</li>
+<li>UTF-16：UCS-2 的扩展，使用两字节长度代码单元的可变长度编码系统。利用 BMP 内 <code>D800</code> - <code>DFFF</code>的保留空间保存字符编码信息。具体过程比较复杂。</li>
+<li>UTF-32：与 UCS-4 唯一的区别是去掉了超过 10FFFF 的代码点，实际上没有区别。</li>
+<li>GB18030：中国的官方标准编码，实现了对unicode字符集的完整支持（但并不是官方的 unicode 编码系统）。2006 年开始在中国售卖的软件产品需要支持GB18030。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>bits</th>
+<th>encoding</th>
+<th>character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01000001</td>
+<td>UTF-8</td>
+<td>A</td>
+</tr>
+<tr>
+<td>00000000 01000001</td>
+<td>UTF-16</td>
+<td>A</td>
+</tr>
+<tr>
+<td>00000000 00000000 00000000 01000001</td>
+<td>UTF-32</td>
+<td>A</td>
+</tr>
+<tr>
+<td>11100100 10111000 10000000</td>
+<td>UTF-8</td>
+<td>一</td>
+</tr>
+<tr>
+<td>01001110 00000000</td>
+<td>UTF-16</td>
+<td>一</td>
+</tr>
+<tr>
+<td>00000000 00000000 01001110 00000000</td>
+<td>UTF-32</td>
+<td>一</td>
+</tr>
+</tbody>
+</table>
+<p>此外还存在 UTF-1，UTF-7，UTF-EBCDIC 等已经被淘汰或有特殊用途的编码系统。</p>
+<p>对于 UTF-16 等代码单元长度超过一个字节的系统，还存在着数据 endian 的问题，所以还能分为 UTF-16LE，UTF-16BE等系统。</p>
+<p><code>Python 3</code> 内部会根据字符范围动态选择 latin-1（ISO 8859 定义的单字节编码）， UCS-2 或 UTF-32 保存字符串。</p>
+<p><a href="http://es5.github.io/x2.html#x2" target="_blank" rel="noopener">ES5 标准</a>允许 <code>javascript</code> 引擎使用 UCS-2 或 UTF-16 保存字符串，由于 UCS-2 编码只能表示 BMP 内的字符，造成了某些情况下的兼容性问题。</p>
+<h2 id="尝试一下"><a href="#尝试一下" class="headerlink" title="尝试一下"></a>尝试一下</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">char2bin</span><span class="params">(s, encoding)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">' '</span>.join(map(<span class="keyword">lambda</span> x: <span class="string">f'<span class="subst">&#123;bin(x)[<span class="number">2</span>:]:&gt;<span class="number">08</span>&#125;</span>'</span>, s.encode(encoding)))</span><br><span class="line"></span><br><span class="line">char2bin(<span class="string">'我'</span>, <span class="string">'utf_16_be'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="网站可以正常运行，为什么数据库里会有乱码？"><a href="#网站可以正常运行，为什么数据库里会有乱码？" class="headerlink" title="网站可以正常运行，为什么数据库里会有乱码？"></a>网站可以正常运行，为什么数据库里会有乱码？</h2><p>一种常见的问题是，网站可以正常输出网页，但使用数据库客户端直接访问数据库时却得到了乱码。原因在于数据库保存的是二进制数据，也就是“编码”的产物。比如数据库中保存了 GBK 编码的字符串“我”，二进制数据为<code>11001110 11010010</code>，却错误的把默认的编码格式设置成了 UTF-16。当网站读取到二进制数据之后，后端代码按照 GBK 编码进行解码，可以正常解码。当使用数据库客户端查询数据时，客户端按照 UTF-16 进行解码，最终得到了 <code>컒</code>。</p>
+<h2 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h2><p><a href="https://unicode.org/glossary/" target="_blank" rel="noopener">术语表</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/" data-id="cldignsgn0001tvi0hkkod2dh" class="article-share-link">Share</a>
+      
+        <a href="http://ak64th.github.com/notes/2020/01/30/AboutEncoding/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/notes/2018/03/12/Python-Timezone-Howto/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">如何处理Python的datetime时区问题</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/notes/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/notes/tags/python/">python</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/notes/tags/django/" style="font-size: 10px;">django</a> <a href="/notes/tags/python/" style="font-size: 10px;">python</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/notes/archives/2020/01/">一月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/notes/archives/2018/03/">三月 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/notes/2020/01/30/AboutEncoding/">关于编码的一些知识</a>
+          </li>
+        
+          <li>
+            <a href="/notes/2018/03/12/Python-Timezone-Howto/">如何处理Python的datetime时区问题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2023 Elmer Yu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/notes/" class="mobile-nav-link">Home</a>
+  
+    <a href="/notes/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'ak64th-notes';
+  
+  var disqus_url = 'http://ak64th.github.com/notes/2020/01/30/AboutEncoding/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/notes/fancybox/jquery.fancybox.css">
+  <script src="/notes/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/notes/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
